@@ -5,7 +5,7 @@ import {
   escapeHtml, formatDate, monthKey, monthLabel
 } from "../js/common.js";
 import {
-  DEFAULT_CATEGORIES, createRoom, getRoomByAdmin, listenRoom,
+  DEFAULT_CATEGORIES, createRoom, getRoomById, listenRoom,
   listenMembers, listenPendingRequests, approveJoinRequest, rejectJoinRequest, setMemberStatus,
   listenCategories, addCustomCategory,
   addExpense, updateExpense, archiveExpense, listenExpenses,
@@ -21,14 +21,22 @@ let selectedMonth = monthKey();
 
 requireAuth({
   expectedRole: "roomAdmin",
-  onReady: async (user) => {
+  onReady: async (user, profile) => {
     currentUser = user;
     $("loader").classList.add("hidden");
-    const room = await getRoomByAdmin(user.uid);
-    if (!room) {
-      $("createRoomOverlay").classList.remove("hidden");
-    } else {
-      bootRoom(room.id);
+    try {
+      const room = profile?.roomId ? await getRoomById(profile.roomId) : null;
+      if (!room) {
+        $("createRoomOverlay").classList.remove("hidden");
+      } else {
+        bootRoom(room.id);
+      }
+    } catch (err) {
+      $("loader").classList.remove("hidden");
+      $("loader").innerHTML = `<div style="padding:24px;text-align:center;color:var(--red,#c0392b);">
+        Couldn't load your room. ${escapeHtml(friendlyError(err))}<br><br>
+        <button class="btn btn-primary" style="width:auto;padding:10px 20px;" onclick="location.reload()">Retry</button>
+      </div>`;
     }
   }
 });
