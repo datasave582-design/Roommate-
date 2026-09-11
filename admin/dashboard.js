@@ -1,4 +1,4 @@
-import { auth } from "../js/firebase-config.js";
+import { auth, ROOT_PATH } from "../js/firebase-config.js";
 import { requireAuth, logoutUser } from "../js/auth.js";
 import {
   formatMoney, rupeesToPaise, showToast, friendlyError, withLoading,
@@ -531,5 +531,5 @@ $("confirmOk").addEventListener("click", async () => {
 // ================= LOGOUT =================
 $("logoutBtn").addEventListener("click", () => confirmAction("Log out?", "You'll need to log in again to access your room.", async () => {
   await logoutUser();
-  window.location.href = "/index.html";
+  window.location.href = ROOT_PATH + "index.html";
 }));
