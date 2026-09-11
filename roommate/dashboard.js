@@ -1,4 +1,4 @@
-import { auth } from "../js/firebase-config.js";
+import { auth, ROOT_PATH } from "../js/firebase-config.js";
 import { requireAuth, logoutUser, getUserProfile } from "../js/auth.js";
 import { formatMoney, showToast, friendlyError, withLoading, escapeHtml, formatDate, monthKey, monthLabel } from "../js/common.js";
 import {
@@ -167,4 +167,4 @@ document.querySelectorAll(".nav-item").forEach(item => {
     $("tab-" + item.dataset.tab).classList.remove("hidden");
   });
 });
-$("logoutBtn").addEventListener("click", async () => { await logoutUser(); window.location.href = "/index.html"; });
+$("logoutBtn").addEventListener("click", async () => { await logoutUser(); window.location.href = ROOT_PATH + "index.html"; });
