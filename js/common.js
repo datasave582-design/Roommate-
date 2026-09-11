@@ -92,6 +92,21 @@ export function formatDate(ts) {
   return d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
 }
 
+// ---- Date <input type="date"> helpers ----
+// new Date("YYYY-MM-DD") parses as UTC midnight, which can land on the wrong
+// calendar day once converted back to local time for users west of UTC.
+// These helpers always work in local time so the date picked is the date saved.
+export function dateInputToDate(str) {
+  if (!str) return new Date();
+  const [y, m, d] = str.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+export function dateToInputValue(ts) {
+  const d = ts && ts.toDate ? ts.toDate() : new Date(ts);
+  const y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, "0"), day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 // ---- PWA: register service worker + show an install affordance only when the browser actually offers one ----
 // Computed from this file's own location (always "<root>/js/common.js" on every
 // page) so registration works whether the site is deployed at a domain root or
