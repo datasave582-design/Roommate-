@@ -23,7 +23,8 @@
       <div class="emoji">👨‍💼</div>
       <div><h3>Room Admin</h3><p>Manage room expenses &amp; roommates</p></div>
     </div>
-    <div class="role-card" data-role="landlord">
+    <div class="role-card soon" data-role="landlord">
+      <span class="soon-badge">SOON</span>
       <div class="emoji">🏠</div>
       <div><h3>Makan Malik</h3><p>Manage building, rooms &amp; rent</p></div>
     </div>
@@ -100,7 +101,12 @@ onAuthStateChanged(auth, async (user) => {
 
 document.querySelectorAll(".role-card").forEach(card => {
   card.addEventListener("click", () => {
-    selectedRole = card.dataset.role;
+    const role = card.dataset.role;
+    if (role === "landlord") {
+      showToast("Makan Malik portal is launching soon 🚧");
+      return;
+    }
+    selectedRole = role;
     const label = roleLabel[selectedRole];
     $("loginTitle").textContent = label + " Login";
     $("loginSub").textContent = "Login to your " + label + " account";
