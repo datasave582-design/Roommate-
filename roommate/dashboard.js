@@ -27,6 +27,10 @@ requireAuth({
 });
 
 function watchForPendingOrApproval() {
+  // Show the join form immediately as the default state so there's no blank
+  // flash while we wait for the (usually near-instant) snapshot below to
+  // tell us whether a pending request already exists.
+  $("joinOverlay").classList.remove("hidden");
   const q = query(collection(db, "joinRequests"), where("uid", "==", currentUser.uid), where("status", "==", "pending"));
   onSnap2(q, (snap) => {
     if (!snap.empty) {
