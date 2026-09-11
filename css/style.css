@@ -138,5 +138,4 @@ img{max-width:100%;display:block;}
   .app-body{max-width:760px;padding-top:28px;}
   .stat-grid{grid-template-columns:repeat(4,1fr);}
   .fab{display:none;}
-              }
-  
+}
