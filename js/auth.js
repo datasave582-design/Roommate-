@@ -1,5 +1,5 @@
 // auth.js — Firebase Authentication + users/{uid} profile handling
-import { auth, db } from "./firebase-config.js";
+import { auth, db, ROOT_PATH } from "./firebase-config.js";
 import {
   createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,
   sendPasswordResetEmail, onAuthStateChanged, updateProfile
@@ -57,19 +57,19 @@ export async function getUserProfile(uid) {
 export function requireAuth({ expectedRole, onReady }) {
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
-      window.location.href = "/index.html";
+      window.location.href = ROOT_PATH + "index.html";
       return;
     }
     const profile = await getUserProfile(user.uid);
     if (!profile) {
-      window.location.href = "/index.html";
+      window.location.href = ROOT_PATH + "index.html";
       return;
     }
     if (expectedRole && profile.role !== expectedRole) {
       // Logged-in user trying to open a dashboard that isn't theirs — bounce
       // them to their actual role's dashboard, never trust the URL.
-      const dest = { roomAdmin: "/admin/dashboard.html", landlord: "/landlord/dashboard.html", roommate: "/roommate/dashboard.html" };
-      window.location.href = dest[profile.role] || "/index.html";
+      const dest = { roomAdmin: "admin/dashboard.html", landlord: "landlord/dashboard.html", roommate: "roommate/dashboard.html" };
+      window.location.href = ROOT_PATH + (dest[profile.role] || "index.html");
       return;
     }
     onReady(user, profile);

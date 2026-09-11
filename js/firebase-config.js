@@ -18,6 +18,13 @@ const firebaseConfig = {
   measurementId: "G-ESJCWE4L2Q"
 };
 
+// The site can be deployed at a domain root (e.g. Firebase Hosting) OR under a
+// sub-path (e.g. GitHub Project Pages: username.github.io/repo-name/). Every
+// redirect in the app must work in both cases, so we compute the project's
+// actual root URL here — once — from this file's own location, instead of
+// hardcoding "/index.html" style absolute paths anywhere else.
+export const ROOT_PATH = new URL("..", import.meta.url).href;
+
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 setPersistence(auth, browserLocalPersistence).catch(() => {});

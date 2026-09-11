@@ -93,9 +93,13 @@ export function formatDate(ts) {
 }
 
 // ---- PWA: register service worker + show an install affordance only when the browser actually offers one ----
+// Computed from this file's own location (always "<root>/js/common.js" on every
+// page) so registration works whether the site is deployed at a domain root or
+// under a sub-path (e.g. GitHub Project Pages: username.github.io/repo-name/).
+const SITE_ROOT = new URL("..", import.meta.url).href;
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/service-worker.js").catch(() => {});
+    navigator.serviceWorker.register(SITE_ROOT + "service-worker.js").catch(() => {});
   });
 }
 let deferredInstallPrompt = null;
