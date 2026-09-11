@@ -15,8 +15,10 @@ export const DEFAULT_CATEGORIES = ["Food/Grocery","Electricity","Internet","Rent
 
 // ---------- Room creation (unique code via transaction) ----------
 export async function createRoom(adminUid, { name, flatNumber, address, city, rent, dueDate, description }) {
-  return runTransaction(db, async (tx) => {
-    let code, codeRef, codeSnap;
+  const roomRef = doc(collection(db, "rooms"));
+  let code;
+  await runTransaction(db, async (tx) => {
+    let codeRef, codeSnap;
     for (let i = 0; i < 8; i++) {
       code = generateRoomCode();
       codeRef = doc(db, "roomCodes", code);
@@ -26,7 +28,6 @@ export async function createRoom(adminUid, { name, flatNumber, address, city, re
     }
     if (!code) throw new Error("Could not generate a unique room code, please try again.");
 
-    const roomRef = doc(collection(db, "rooms"));
     tx.set(roomRef, {
       roomId: roomRef.id,
       adminUid,
@@ -41,12 +42,22 @@ export async function createRoom(adminUid, { name, flatNumber, address, city, re
       updatedAt: serverTimestamp()
     });
     tx.set(codeRef, { roomId: roomRef.id, createdAt: serverTimestamp() });
-    tx.set(doc(db, "rooms", roomRef.id, "members", adminUid), {
-      uid: adminUid, role: "admin", status: "active", joinedAt: serverTimestamp()
-    });
     tx.update(doc(db, "users", adminUid), { roomId: roomRef.id, updatedAt: serverTimestamp() });
-    return roomRef.id;
   });
+
+  // The admin's own member-entry MUST be written as a separate request, after
+  // the transaction above has actually committed. Firestore rules resolve
+  // get()/exists() calls against the database state at the START of a
+  // transaction — they never see writes made earlier in that same
+  // transaction. isRoomAdmin() (used by the members/{uid} create rule) reads
+  // the room via get(), so if this write stayed inside the transaction that
+  // creates the room itself, the rule would always see "room doesn't exist
+  // yet" and reject it — which is exactly what was happening before this fix.
+  await setDoc(doc(db, "rooms", roomRef.id, "members", adminUid), {
+    uid: adminUid, role: "admin", status: "active", joinedAt: serverTimestamp()
+  });
+
+  return roomRef.id;
 }
 
 export async function getRoomByAdmin(adminUid) {
