@@ -3,20 +3,23 @@
 // this worker never intercepts Firestore/Auth network calls, so a write only
 // ever reports success once Firebase has actually confirmed it (spec §59).
 const CACHE_NAME = "roommate-shell-v1";
+// Relative (no leading "/") so these resolve against this file's own location —
+// works whether the site is deployed at a domain root or under a sub-path
+// (e.g. GitHub Project Pages: username.github.io/repo-name/).
 const SHELL_FILES = [
-  "/index.html",
-  "/css/style.css",
-  "/js/firebase-config.js",
-  "/js/auth.js",
-  "/js/common.js",
-  "/js/room-data.js",
-  "/admin/dashboard.html",
-  "/admin/dashboard.js",
-  "/roommate/dashboard.html",
-  "/roommate/dashboard.js",
-  "/manifest.json",
-  "/icon-192.png",
-  "/icon-512.png"
+  "index.html",
+  "css/style.css",
+  "js/firebase-config.js",
+  "js/auth.js",
+  "js/common.js",
+  "js/room-data.js",
+  "admin/dashboard.html",
+  "admin/dashboard.js",
+  "roommate/dashboard.html",
+  "roommate/dashboard.js",
+  "manifest.json",
+  "icon-192.png",
+  "icon-512.png"
 ];
 
 self.addEventListener("install", (event) => {
@@ -38,6 +41,6 @@ self.addEventListener("fetch", (event) => {
     return;
   }
   event.respondWith(
-    caches.match(event.request).then((cached) => cached || fetch(event.request).catch(() => caches.match("/index.html")))
+    caches.match(event.request).then((cached) => cached || fetch(event.request).catch(() => caches.match("index.html")))
   );
 });
