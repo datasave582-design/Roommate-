@@ -55,6 +55,17 @@ export async function getRoomByAdmin(adminUid) {
   return snap.empty ? null : { id: snap.docs[0].id, ...snap.docs[0].data() };
 }
 
+// Direct single-document lookup — used instead of getRoomByAdmin() as the
+// primary path on dashboard load. A `where(adminUid==...)` collection query's
+// security rule can't always be proven safe by Firestore's query validator,
+// which silently denies it; reading rooms/{roomId} by the id already stored
+// on the user's own profile (users/{uid}.roomId, set in createRoom()) is a
+// single-document read and doesn't hit that restriction.
+export async function getRoomById(roomId) {
+  const snap = await getDoc(doc(db, "rooms", roomId));
+  return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+}
+
 export function listenRoom(roomId, cb) {
   return onSnapshot(doc(db, "rooms", roomId), (snap) => cb(snap.exists() ? { id: snap.id, ...snap.data() } : null));
 }
